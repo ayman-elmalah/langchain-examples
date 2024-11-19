@@ -13,6 +13,7 @@ This repository contains examples for using Langchain in various projects. The e
     4. [Basic prompt template](#basic-prompt-template)
     5. [Basic chain](#basic-chain)
     6. [Chain from messages](#chain-from-messages)
+    7. [Rag blog](#rag-blog)
 
 
 ## 1. Installation
@@ -133,3 +134,40 @@ This project demonstrates a basic chain using the `from_messages` handler to int
     ```bash
     python3 examples/chain-from-messages/main.py
     ```
+
+### rag-blog
+
+This project demonstrates how to ingest content from a blog, process it, and use it for retrieval-augmented generation (RAG) with Langchain.
+
+- **How it works**: The `rag-blog` example ingests a blog post from a text file or URL, splits the content into smaller chunks, and stores the processed content in Pinecone using OpenAI embeddings. When a query is provided, the system retrieves relevant content from Pinecone and uses it to generate a response.
+- **To run it**: To execute the `rag-blog` example, run the following command:
+
+    1. **Get Pinecone API Key**:
+        - Go to [Pinecone](https://www.pinecone.io/) and create a new account.
+        - From the sidebar, navigate to **API Keys**.
+        - Create a new API key and save it in your `.env` file as `PINECONE_API_KEY`.
+
+    2. **Create Pinecone Index**:
+        - From the Pinecone dashboard, go to **Database** → **Indexes**.
+        - Click **Create Index** and choose a name and configuration (e.g., **text-embedding-text-small** or another option that fits your needs).
+        - Save the index name in your `.env` file as `RAG_BLOG_INDEX_NAME`.
+
+    3. **Run the Ingest Script**:
+        Once you've set up your Pinecone API key and index, run the following command to ingest the blog content:
+
+
+##### Ingest
+
+This will ingest the blog post, split it into chunks, and store the embeddings in Pinecone for future retrieval. You can then use the query functionality to interact with the stored content:
+
+```bash
+python3 examples/rag-blog/ingest.py
+```
+
+##### Query
+
+This will retrieve relevant information from Pinecone based on the query and generate a response.
+
+```bash
+python3 examples/rag-blog/query.py
+```

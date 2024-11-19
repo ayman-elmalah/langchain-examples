@@ -3,4 +3,6 @@ langchain
 langchain-core
 langchain-openai
 langchain-community
+langchain-pinecone
+langchain-text-splitters
 mysql-connector-python

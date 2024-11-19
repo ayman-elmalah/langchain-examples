@@ -1,0 +1,292 @@
+
+Dockerize php application
+In this article you will learn how to dockerize php application or any php framework like laravel, symfony,,
+Ayman Elmalah
+Ayman Elmalah
+
+·
+Follow
+
+5 min read
+·
+May 2, 2020
+
+
+
+The first question is : What is docker ?
+Docker is a set of platform as service (PaaS) products that uses OS level virtualization to deliver software in packages called containers. Containers are isolated from one another and bundle their own software, libraries and configuration files; they can communicate with each other through well-defined channels. All containers are run by a single operating system kernel and therefore use fewer resources than virtual machines
+
+you can learn more about docker from this link
+
+Prerequests
+
+Docker installed
+Knowledge about docker
+Knowledge about php
+What is the services that we will use ?
+
+php
+mysql
+nginx
+phpmyadmin
+composer
+artisan
+npm
+We need to build directory structure for the application first
+
+|-- phpdock
+    |   |-- nginx
+    |   |   |-- default.conf
+    |   |-- php
+    |   |   |-- Dockerfile
+    |   |-- .env
+    |   |-- .env.example
+    |   |-- .gitignore
+    |   |-- docker-compose.yml
+    |
+    |-- src
+        |-- public
+            |-- index.php
+First thing we will open our phpdock/docker-compose.yml then start structure our file
+
+version: '3'
+networks:
+  backend:
+services:
+  php:
+
+  mysql:
+
+  nginx:
+  phpmyadmin:
+  composer:
+  artisan:
+
+  npm:
+This will be the file structure for docker-compose.yml file, we will use version 3 of docker compose, the network to communicate between services will be backend and you can name it the name you want
+
+and we will list the services as showed in code
+
+HINT : we will use .env to put out environment data and call it at docker-compose.yml
+
+As known .env can contain key=value and in docker-compose.yml we can call value by the given key as this way ${KEY}
+
+Now we can start build the first service in our file, it’s PHP
+
+we still opened docker-compose.yml so web can update php service
+
+php:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    container_name: php
+    volumes:
+      - ../src:/var/www/html
+    ports:
+      - "${PHP_PORT}:${PHP_HOST_PORT}"
+    networks:
+      - backend
+We can now explain this part
+
+In this part we will use Dockerfile to pull php from docker, the docker file will be placed in phpdock/php/Dockerfile so the build of service will use context ./php as it’s the path of Dockerfile, then the docker file name is Dockerfile, we can now name the pulled container php or the name you can, we will use the volumes to share user data to the container directory so developer will work on src/ we can access this path using ../src and it will share this data to var/www/html, now we need to use a port for php, we will write it in .env and use it in this file as a variable like ${KEY}, networks that will be used in php is backend
+
+Now we can update phpdock/php/Dockerfile
+
+FROM php:7.4-fpm-alpine
+WORKDIR /var/www/html
+RUN docker-php-ext-install pdo pdo_mysql
+in dockerfile we can pull php version from official php, and we can make workdir /var/www/html , we need other extenstions to install in our app, you can add the extensions you want, it’s simple example
+
+Now we can update phpdock/.env
+
+######################## PHP ########################
+PHP_PORT=8081
+PHP_HOST_PORT=80
+The other service that we need to update is MYSQL, we will open docker-compose.yml and update mysql service
+
+mysql:
+    image: mysql:${MYSQL_VERSION}
+    container_name: mysql
+    restart: always
+    tty: true
+    ports:
+      - "${MYSQL_PORT}:${MYSQL_HOST_PORT}"
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    networks:
+      - backend
+The same code as php but now we can pull mysql from docker-compose.yml, the new thing you need to know that in mysql we need to create database with user and password after installation, so we wrote environment variables
+
+Now we can update phpdock/.env
+
+######################## MYSQL ########################
+MYSQL_VERSION=5.7.29
+MYSQL_DATABASE=default
+MYSQL_USER=default
+MYSQL_PASSWORD=secret
+MYSQL_ROOT_PASSWORD=secret
+MYSQL_PORT=3306
+MYSQL_HOST_PORT=3306
+The other service that we need to update is NGINX, we will open docker-compose.yml and update nginx service
+
+nginx:
+    image: nginx:${NGINX_VERSION}
+    container_name: nginx
+    ports:
+      - "${NGINX_PORT}:${NGINX_HOST_PORT}"
+    volumes:
+      - ../src:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - php
+      - mysql
+    networks:
+      - backend
+we will pull nginx and we can add a new volume to make developer write app configuration as the way app need, the nginx depends on php and mysql services
+
+Now we can update phpdock/nginx/default.conf
+
+server {
+    listen 80;
+    index index.php index.html;
+    server_name localhost;
+    error_log  /var/log/nginx/error.log;
+    access_log /var/log/nginx/access.log;
+    root /var/www/html/public;
+    location / {
+        try_files $uri $uri/ /index.php?$query_string;
+    }
+    location ~ \.php$ {
+        try_files $uri =404;
+        fastcgi_split_path_info ^(.+\.php)(/.+)$;
+        fastcgi_pass php:9000;
+        fastcgi_index index.php;
+        include fastcgi_params;
+        fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+        fastcgi_param PATH_INFO $fastcgi_path_info;
+    }
+}
+and we can also update phpdock/.env
+
+######################## NGINX ########################
+NGINX_VERSION=stable-alpine
+NGINX_PORT=8080
+NGINX_HOST_PORT=80
+The other service that we need to update is PHPMYADMIN, we will open docker-compose.yml and update phpmyadmin service
+
+phpmyadmin:
+    image: phpmyadmin/phpmyadmin:${PHPMYADMIN_VERSION}
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "${PHPMYADMIN_PORT}:${PHPMYADMIN_HOST_PORT}"
+    depends_on:
+      - php
+      - mysql
+    environment:
+      PMA_HOST: ${PMA_HOST}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    networks:
+      - backend
+phpmyadmin is very easy to understand how to build, it’s the same as other services and no thing is complicated,
+
+and we can also update phpdock/.env
+
+######################## PHPMYADMIN ########################
+PHPMYADMIN_VERSION=4.7
+PHPMYADMIN_PORT=8082
+PHPMYADMIN_HOST_PORT=80
+PMA_HOST=mysql
+Now the application is ready for running but other frameworks like laravel will need some features to work well like composer, artisan, and npm so we will add it to our app and of you dont need it you can skip this step
+
+Now we can add features we will need, so we will update now composer service at docker-compose.yml
+
+composer:
+    image: composer:${COMPOSER_VERSION}
+    container_name: composer
+    volumes:
+      - ../src:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      - php
+    networks:
+      - backend
+it’s very easy to understand this code, so we can now update phpdock/.env
+
+######################## COMPOSER ########################
+COMPOSER_VERSION=latest
+Now we can add artisan service, we can update docker-compose.yml
+
+artisan:
+    build:
+      context: ./php
+      dockerfile: Dockerfile
+    container_name: artisan
+    volumes:
+      - ../src:/var/www/html
+    depends_on:
+      - mysql
+    working_dir: /var/www/html
+    entrypoint: ['php', '/var/www/html/artisan']
+    networks:
+      - backend
+The new thing you want to know is entrypoint, we do it to make developer write the command artisan and it will point to php /var/www/html/artisan, it’s the php path
+
+The last section we will do is npm service, we can update docker-compose.yml
+
+npm:
+    image: node:${NODE_VERSION}
+    container_name: npm
+    volumes:
+      - ../src:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ['npm']
+And we need now update phpdock/.env
+
+######################## NODE ########################
+NODE_VERSION=13.7
+Now we can copy .env file content to .env.example content, and in .gitignore we can make .env ignored so we can push it to any git repository without push .env to save our data
+
+Now the services is ready for installed
+
+you can now open your terminal and go to phpdock directory then run this command
+
+docker-compose build && docker-compose up -d
+Then open src/public/index.php
+
+<?php
+echo "Hello world";
+Open your browser and visit http://127.0.0.1:8080/ for your php code, http://127.0.0.1:8082/ for phpmyadmin access
+
+All thing is good until now
+
+If you want to install laravel as example, you can clone it into src app then access this link in brwoser you will show laravel app http://127.0.0.1:8080/
+
+To run composer command like composer dump autoload => go to terminal in phpdock and run this command
+docker-compose run composer dump-autoload
+To run artisan command like php artisan migrate => go to terminal in phpdock and run this command
+docker-compose run artisan migrate
+To run npm command like npm install => go to terminal in phpdock and run this command
+docker-compose run npm install
+If you are using laravel, these lines will be database environments variables in .env, or the variables you wrote in .env for docker
+
+DB_CONNECTION=mysql
+DB_HOST=mysql
+DB_PORT=3306
+DB_DATABASE=default
+DB_USERNAME=default
+DB_PASSWORD=secret
+You will find source code here
+
+Docker
+PHP
+Laravel
+
+
+Ayman Elmalah
+Written by Ayman Elmalah
