@@ -51,19 +51,8 @@ langchain-examples/
 ├── .env.example
 ├── .env
 ├── requirements.txt
-├── chat-models/
-│   └── main.py
-├── basic-conversation/
-│   └── main.py
-├── advanced-conversation/
-│   ├── db/
-│   │   ├── connection.py
-│   │   ├── messages.py
-│   │   └── users.py
-│   ├── core/
-│   │   ├── messages.py
-│   ├── db.sql
-│   └── main.py
+├── examples/
+│   └── ...
 ```
 
 ## 3. Examples
@@ -78,7 +67,7 @@ This is a very basic implementation where the user sends a message to the AI mod
 - **To run it**: Simply run the following command:
 
     ```bash
-    python3 chat-models/main.py
+    python3 examples/chat-models/main.py
     ```
 
 ### basic-conversation
@@ -89,7 +78,7 @@ This project demonstrates a basic conversation with the AI. It includes a system
 - **To run it**: To execute the basic conversation example, run the following command:
 
     ```bash
-    python3 basic-conversation/main.py
+    python3 examples/basic-conversation/main.py
     ```
 
 ### advanced-conversation
@@ -106,5 +95,5 @@ This project builds on the previous ones by adding more complex functionality, s
 - **To run it**: After setting up the database, run the following command:
 
     ```bash
-    python3 advanced-conversation/main.py 1
+    python3 examples/advanced-conversation/main.py 1
     ```
