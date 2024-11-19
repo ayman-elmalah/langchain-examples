@@ -11,6 +11,8 @@ This repository contains examples for using Langchain in various projects. The e
     2. [Basic conversation](#basic-conversation)
     3. [Advanced conversation](#advanced-conversation)
     4. [Basic prompt template](#basic-prompt-template)
+    5. [Basic chain](#basic-chain)
+    6. [Chain from messages](#chain-from-messages)
 
 
 ## 1. Installation
@@ -99,7 +101,6 @@ This project builds on the previous ones by adding more complex functionality, s
     python3 examples/advanced-conversation/main.py 1
     ```
 
-
 ### basic-prompt-template
 
 This project demonstrates a basic prompt template handler to the AI.
@@ -109,4 +110,26 @@ This project demonstrates a basic prompt template handler to the AI.
 
     ```bash
     python3 examples/basic-prompt-template/main.py
+    ```
+
+### basic-chain
+
+This project demonstrates a basic chain template handler to the AI.
+
+- **How it works**: A prompt template is defined and initialized with placeholders. The template is then connected to the AI model using a chain operation. When the chain is invoked with input values, the prompt is populated with the provided data, sent to the AI model, and the response is generated and returned.
+- **To run it**: To execute the basic chain example, run the following command:
+
+    ```bash
+    python3 examples/basic-chain/main.py
+    ```
+
+### chain-from-messages
+
+This project demonstrates a basic chain using the `from_messages` handler to interact with the AI.
+
+- **How it works**: A chat prompt template is created using multiple predefined messages, including placeholders (e.g., `topic` and `jokes_count`). The template is connected to the AI model through a chain operation. When the chain is invoked with input values, the placeholders are replaced with the provided data, the messages are sent to the AI model, and the output is parsed and returned as a response.
+- **To run it**: To execute the `chain-from-messages` example, run the following command:
+
+    ```bash
+    python3 examples/chain-from-messages/main.py
     ```
