@@ -14,6 +14,7 @@ This repository contains examples for using Langchain in various projects. The e
     5. [Basic chain](#basic-chain)
     6. [Chain from messages](#chain-from-messages)
     7. [Rag blog](#rag-blog)
+    8. [Basic agent tools](#basic-agent-tools)
 
 
 ## 1. Installation
@@ -171,3 +172,23 @@ This will retrieve relevant information from Pinecone based on the query and gen
 ```bash
 python3 examples/rag-blog/query.py
 ```
+
+### basic-agent-tools
+
+This project demonstrates the creation of a simple agent with tools for performing specific tasks such as fetching the current time and performing calculations. 
+
+- **How it works**: The `basic-agent-tools` example defines a custom agent with two tools:
+    - `Time`: Fetches the current time in the H:MM AM/PM format.
+    - `Calculator`: Performs basic calculations based on a query.
+
+  The agent is built using Langchain's `create_react_agent` function and integrates these tools to handle queries.
+
+- **To run it**: To execute the `basic-agent-tools` example, follow these steps:
+
+    1. Ensure you have the necessary environment variables set up (e.g., for OpenAI API keys) in a `.env` file.
+    2. Run the example:
+
+        ```bash
+        python3 examples/basic-agent-tools/main.py
+        ```
+       
