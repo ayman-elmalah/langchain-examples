@@ -15,6 +15,7 @@ This repository contains examples for using Langchain in various projects. The e
     6. [Chain from messages](#chain-from-messages)
     7. [Rag blog](#rag-blog)
     8. [Basic agent tools](#basic-agent-tools)
+    9. [Agent chat](#agent-chat)
 
 
 ## 1. Installation
@@ -192,3 +193,33 @@ This project demonstrates the creation of a simple agent with tools for performi
         python3 examples/basic-agent-tools/main.py
         ```
        
+### agent-chat
+
+This project demonstrates the creation of a conversational AI agent that can maintain context across interactions using **structured chat prompts** and **conversation memory**. The agent is equipped with tools for fetching the current time and searching Wikipedia.
+
+---
+
+#### **How it works**
+- **Tools**: 
+    - `Time`: Provides the current time in H:MM AM/PM format.
+    - `Wikipedia`: Searches Wikipedia and returns a brief summary of the first result.
+
+- **Agent Setup**:
+    - Utilizes a structured chat agent created with `create_structured_chat_agent`.
+    - Maintains conversation context using `ConversationBufferMemory`, which stores chat history.
+    - Employs a JSON-based chat prompt loaded from the LangChain Hub.
+
+- **Features**:
+    - Can provide responses using tools or general conversational capabilities.
+    - Maintains context across user interactions by remembering previous messages.
+    - Handles parsing errors gracefully.
+
+---
+
+#### **To run it**
+1. Ensure you have the required dependencies installed:
+2. Run the script:
+
+    ```bash
+    python3 examples/agent-chat/main.py
+    ```
